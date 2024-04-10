@@ -1,0 +1,84 @@
+#include <iostream>
+using namespace std;
+
+int sieve(int s, int f);
+int main()
+{
+	int s, f;
+	cin >> s >> f;
+	cout << "Start and finish: " << s << " " << f << "\n";
+	sieve(s, f);
+}
+
+int sieve(int s, int f)
+{
+
+	int a[f+2];
+	for (int i = 2; i < f+2; ++i)
+	{
+		a[i] = 1;
+	}
+	int j = 2;
+	//пока наше число не вышло за пределы правой границы
+	int iter = 1;
+	while (j < f)
+	{
+		//перепрыгиваем все числа, которые уже вычеркнули
+		while (a[j] != 1)
+		{
+			j++;
+		}
+		//проверка того что итерация не пуста
+		int t = 0;
+		for (int i = j; i < f; i += j)
+		{
+			if ((i + j >= s && i + j <= f) && a[i + j] == 1)
+				t = 1;
+		}
+		if (t == 1)
+		{
+			cout << "Iteration : " << iter<< "\n";
+			//определили число теперь выч1ркиваем составные числа
+			for (int i = j; i <= f-j; i += j)
+			{
+				a[i + j]--;
+				if ((i + j >= s && i + j <= f) && a[i + j] == 0)
+					cout << i + j << " ";
+			}
+			j++;
+			iter++;
+			cout << "\n";
+		}
+		else
+		{
+			j++;
+			iter++;
+		}
+	}
+
+
+
+	cout << "Primes :\n";
+	//проверка на наличие простых чисел
+	int flag = 0;
+	for (int i = 2; i < f+1; ++i)
+	{
+		if (a[i] == 1 && i>=s && i<=f)
+		{
+			flag = 1;
+		}
+	}
+	if (flag==1)
+	{
+		for (int i = 2; i < f + 1; ++i)
+		{
+			if (a[i] == 1 && i >= s && i <= f)
+			{
+				cout<<i<<" ";
+			}
+		}
+	}
+	else
+		cout << "No primes";
+	return 0;
+}
