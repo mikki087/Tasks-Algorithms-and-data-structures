@@ -1,0 +1,85 @@
+#include <iostream>
+
+int main()
+{
+	int size;
+	std::cin >> size;
+	int target;
+	std::cin >> target;
+	int* array = new int[size];
+	for (int i = 0; i < size; ++i)
+	{
+		int element;
+		std::cin >> element;
+		array[i] = element;
+	}
+	int* left_pointer = &array[0];
+	int* right_pointer = &array[0];
+
+
+	int min_len = size+10;//first priority
+	int max_summ = -1000;//second priority
+	//third priority didn't need check
+
+
+	int sdvig_right = 0;
+	int sdvig_left = 0;
+	int summ_now = *right_pointer;
+	int start = -1;
+	int finish = -1;
+	
+	while (sdvig_right < size)
+	{
+		//сначала проверка условий
+		if (summ_now >= target)
+		{
+			if (min_len > (right_pointer - left_pointer + 1))
+			{
+				min_len = right_pointer - left_pointer + 1;
+				max_summ = summ_now;
+
+				start = sdvig_left;
+				finish = sdvig_right;
+
+				summ_now -= *left_pointer;
+				left_pointer++;
+				sdvig_left++;
+
+			}
+			else if ((min_len == right_pointer - left_pointer + 1) && (max_summ < summ_now))
+			{
+				max_summ = summ_now;
+				start = sdvig_left;
+				finish = sdvig_right;
+
+				summ_now -= *left_pointer;
+				left_pointer++;
+				sdvig_left++;
+
+			}
+			else
+			{
+				summ_now -= *left_pointer;
+				left_pointer++;
+				sdvig_left++;
+			}
+		}
+		else
+		{
+			right_pointer++;
+			sdvig_right++;
+			summ_now += *right_pointer;
+		}
+	}
+
+	if (start + finish == -2)
+	{
+		std::cout << "No summ";
+	}
+	else
+	{
+		std::cout << "Length = " << min_len << "\n" << "Sum = " << max_summ << "\n" << "Start = " << start << "\n" << "Finish = " << finish;
+
+	}
+	delete[] array;
+}
