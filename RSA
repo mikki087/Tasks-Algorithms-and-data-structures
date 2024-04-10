@@ -1,0 +1,184 @@
+#include <iostream>
+#include <algorithm>
+#include <math.h>
+#include <string>
+
+using namespace std;
+
+__int128 pow_mod(__int128 a, __int128 b, __int128 n);
+__int128 evkl(__int128 a, __int128 b);
+__int128 rsa(int64_t p, __int128 q, int64_t a, string kod);
+
+__int128 read() {
+    __int128 x = 0, f = 1;
+    char ch = getchar();
+    while (ch < '0' || ch > '9') {
+        if (ch == '-') f = -1;
+        ch = getchar();
+    }
+    while (ch >= '0' && ch <= '9') {
+        x = x * 10 + ch - '0';
+        ch = getchar();
+    }
+    return x * f;
+}
+
+void print(__int128 x) {
+    if (x > 9) print(x / 10);
+    putchar(x % 10 + '0');
+}
+
+void perevod_byte(__int128 n)
+{
+	__int128 d = 1;
+	while (n / (d * 256) != 0) {
+		d *= 256;
+	}
+	while (d != 0) {
+		cout<<((int)((n / d) % 256))<< " ";
+		d /= 256;
+	}
+}
+
+
+string bin(__int128 n)
+{
+	string str = "";
+	while (n != 0)
+	{
+		if (n % 2 == 0)
+		{
+			str = '0' + str;
+		}
+		else
+		{
+			str = '1' + str;
+		}
+		n /= 2;
+	}
+	while (str.size() < 8)
+	{
+		str = '0' + str;
+	}
+	return str;
+
+}
+//перевод в 256 сс
+
+
+
+int main()
+{
+	int64_t p, q, a;
+	__int128 t = 61287346712;
+	cin >> p >> q >> a;
+	string kod;
+	cin >> kod;
+	rsa(p, q, a, kod);
+	cout << "\n";
+
+
+
+
+}
+__int128 evkl(__int128 a, __int128 b)
+{
+	while (max(a, b) % min(a, b) != 0)
+	{
+		if (a > b)
+		{
+			a = a % b;
+		}
+		else
+		{
+			b = b % a;
+		}
+	}
+	return min(a, b);
+}
+__int128 pow_mod(__int128 a, __int128 b, __int128 n)
+{
+	if (b == 0)
+	{
+		return 1;
+	}
+	__int128 c = pow_mod(a, b / 2, n);
+	if (b % 2 == 0)
+	{
+		return c * c % n;
+	}
+	else
+	{
+		return ((a % n) * ((c * c) % n)) % n;
+
+	}
+}
+
+
+
+
+__int128 rsa(int64_t p, __int128 q, int64_t a, string kod)
+{
+	__int128 n = p * q;
+	__int128 r = (q - 1) * (p - 1);
+	int64_t e;
+	for (int64_t i = a; i < r; ++i)
+	{
+		//проверка на взаимную простоту
+		if (evkl(i, r) == 1)
+		{
+			e = i;
+			break;
+		}
+	}
+
+	__int128 d = 0;
+	__int128 b = 0;
+	while (true)
+	{
+		if ((b * r + 1) % e == 0)
+		{
+			d = (b * r + 1) / e;
+			break;
+		}
+		else
+			b++;
+	}
+	cout << "Private: ";
+	print(d);
+	cout <<" ";
+	print(n);
+	cout<< "\n";
+	cout << "Public: ";
+	cout << e << " ";
+	print(n);
+	cout << "\n";
+
+	cout << "Initial bytes: ";
+	for (char i : kod)
+	{
+		int k = i;
+		cout << k << " ";
+	}
+
+	cout << "\nEncrypted bytes: ";
+	//для каждого сомвола нужно определить его код
+	string s = "";
+	for (int i = 0; i < kod.size(); ++i)
+	{
+		int k = kod[i];
+		s += bin(k);
+	}
+	//pow_mod(k, e, n) % n
+
+	__int128 ans = 0;
+	__int128 t = 1;
+	for (int i = s.size() - 1; i >= 0; --i)
+	{
+		ans += (int(s[i]) - 48) * t;
+		t *= 2;
+	}
+
+	perevod_byte(pow_mod(ans, e, n));
+	return 0;
+}
