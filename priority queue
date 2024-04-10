@@ -1,0 +1,81 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+struct Priority_Heap {
+
+    Priority_Heap() {
+    }
+
+    void sift_up(int child) {
+        if (child == 0) {
+            return;
+        }
+
+        int parent = (child - 1) / 2;
+        if (buff[parent] < buff[child]) {
+            swap(buff[parent], buff[child]);
+            sift_up(parent);
+        }
+    }
+
+    void sift_down(int parent)
+    {
+        int child_l = 2 * parent + 1;
+        int child_r = 2 * parent + 2;
+
+        int max_priority = parent;
+        if (child_l < buff.size() && buff[child_l] > buff[max_priority])
+        {
+            max_priority = child_l;
+        }
+        if (child_r < buff.size() && buff[child_r] > buff[max_priority])
+        {
+            max_priority = child_r;
+        }
+
+        if (parent != max_priority)
+        {
+            swap(buff[parent], buff[max_priority]);
+            sift_down(max_priority);
+        }
+    }
+
+    void push(int new_element) {
+        buff.push_back(new_element);
+        sift_up(buff.size() - 1);
+    }
+
+    int pop() {
+        int top = buff[0];
+        swap(buff[0], buff[buff.size() - 1]);
+        buff.pop_back();
+        sift_down(0);
+        return top;
+    }
+
+
+    vector<int> buff;
+};
+
+int main() {
+    Priority_Heap heap;
+    int n;
+    cin >> n;
+    for (int i = 0; i < n; i++)
+    {
+        string s;
+        cin >> s;
+        if (s == "Insert")
+        {
+            int priority;
+            cin >> priority;
+            heap.push(priority);
+        }
+        else if (s == "ExtractMax")
+        {
+            cout << heap.pop() << "\n";
+        }
+    }
+    
+}
