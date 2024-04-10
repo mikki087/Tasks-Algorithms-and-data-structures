@@ -1,0 +1,243 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+typedef struct stack_int {
+    int* buf;
+    size_t top;
+    size_t max_size;
+} stack_int;
+
+void new_int(stack_int* stack, size_t max_size)
+{
+    stack->buf = (int*)malloc(max_size * sizeof(int));
+    stack->max_size = max_size;
+    stack->top = 0;
+}
+void delete_int(stack_int* stack) {
+    free(stack->buf);
+}
+
+bool is_empty_int(stack_int* stack) {
+    return stack->top == 0;
+}
+
+bool is_full_int(stack_int* stack) {
+    return stack->top == stack->max_size;
+}
+
+void push_int(stack_int* stack, int value) {
+    if (!(is_full_int(stack))) {
+        stack->buf[stack->top] = value;
+        stack->top++;
+    }
+}
+
+int show_int(stack_int* stack)
+{
+    int t = stack->top - 1;
+    return stack->buf[t];
+}
+int pop_int(stack_int* stack) {
+    if (!is_empty_int(stack)) {
+        stack->top--;
+        return stack->buf[stack->top];
+    }
+
+    return 0;
+}
+
+int top(stack_int* stack) {
+    return stack->buf[stack->top];
+}
+//------------------------------------------------------------
+typedef struct stack {
+    char* buffer;
+    size_t top;
+    size_t max_size;
+} stack_t;
+
+
+
+void new_(stack_t* stack, size_t max_size){
+    stack->buffer = (char*)malloc(max_size * sizeof(char));
+    stack->max_size = max_size;
+    stack->top = 0;
+}
+
+
+void delete_(stack_t* stack) {
+    free(stack->buffer);
+}
+
+bool is_empty_(stack_t* stack) {
+    return stack->top == 0;
+}
+
+bool is_full(stack_t* stack) {
+    return stack->top == stack->max_size;
+}
+
+void push(stack_t* stack, char value) {
+    if (!(is_full(stack))) {
+        stack->buffer[stack->top] = value;
+        stack->top++;
+    }
+}
+
+char show(stack_t* stack)
+{
+    int t = stack->top - 1;
+    return stack->buffer[t];
+}
+
+char top(stack_t* stack) {
+    return stack->buffer[stack->top];
+}
+
+char pop(stack_t* stack) {
+    if (!is_empty_(stack)) {
+        stack->top--;
+        return stack->buffer[stack->top];
+    }
+
+    return 0;
+}
+
+
+int arithmetic(string str, size_t string_size)
+{
+    stack_t stack;
+    stack_t* p_stack = &stack;
+
+    string out[1000];
+    int j = 0;
+
+    new_(p_stack, string_size);
+    for (size_t i = 0; i < string_size; ++i)
+    {
+        if (str[i] == '+' || str[i] == '-')
+        {
+            while ((show(p_stack) == '-' || show(p_stack) == '+' || show(p_stack) == '*' || show(p_stack) == '/') && !is_empty_(p_stack))
+            {
+                out[j]=pop(p_stack);//выкидываем элемент
+                j++;
+            }
+            push(p_stack, str[i]);
+        }
+        else if ((str[i] == '/' || str[i] == '*'))
+        {
+            while ((show(p_stack) == '*' || show(p_stack) == '/'))
+            {
+                out[j]=pop(p_stack);
+                j++;
+            }
+            push(p_stack, str[i]);
+        }
+        else if (str[i] == '(')
+        {
+            push(p_stack, str[i]);
+        }
+        else if (str[i] == ')')
+        {
+            while (show(p_stack) != '(' && !is_empty_(p_stack))
+            {
+                out[j]=pop(p_stack);
+                j++;
+            }
+            pop(p_stack);
+
+        }
+        else
+        {
+            string s = "";
+            while ((int)str[i] <= 57 && (int)str[i] >= 48)
+            {
+                s += str[i];
+                i++;
+            }
+            out[j] = s;
+            j++;
+            i--;
+        }
+    }
+    while (!is_empty_(p_stack))
+    {
+        out[j]=pop(p_stack);
+        j++;
+    }
+    cout << "Reverse Polish Notation:\n";
+    for (int i = 0; i < j; ++i)
+    {
+        cout << out[i] << " ";
+    }
+    /*
+    cout << "Reverse Polish Notation:\n";
+    for (int i = 0; i < out.size(); ++i)
+    {
+        cout << out[i] << " ";
+    }
+    */
+
+    //создал новый стэк для вычисления
+    stack_int mas;
+    stack_int* p_mas = &mas;
+
+    new_int(p_mas, j);
+    int k = 0;
+    while (k != j)
+    {
+        while (out[k] != "+" && out[k] != "-" && out[k] != "*" && out[k] != "/")
+        {
+            push_int(p_mas, stoi(out[k]));
+            k++;
+        }
+        int a1 = pop_int(p_mas);
+        int a2 = pop_int(p_mas);
+        if (out[k] == "+")
+        {
+            push_int(p_mas, a2 + a1);
+        }
+        else if (out[k] == "-")
+        {
+            push_int(p_mas, a2 - a1);
+        }
+        else if (out[k] == "*")
+        {
+            push_int(p_mas, a2 * a1);
+        }
+        else if (out[k] == "/")
+        {
+            push_int(p_mas, a2 / a1);
+        }
+        k++;
+    }
+  
+    cout << "\nResult:\n";
+    cout << pop_int(p_mas);
+    return 0;
+}
+
+
+int main() {
+    string input;
+    cin >> input;
+    cout << "Expression:\n" << input << "\n";
+    string b = "+-*/";
+    int flag = 0;
+    for (int i = 0; i < input.size(); ++i)
+    {
+        if ((int)input[i] <= 57 && (int)input[i] >= 48)
+        {
+            flag++;
+        }
+    }
+    if (flag == input.size())
+    {
+        cout << "Reverse Polish Notation:\n" << input;
+        cout << "\nResult:\n" << input;
+    }
+    else
+        arithmetic(input, input.size());
+    return 0;
+}
